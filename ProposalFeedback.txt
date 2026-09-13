@@ -1,0 +1,47 @@
+CMSI 4071 Fall 2026
+Project Proposal Feedback
+Project: Gather academic tool
+=========================
+Guideline Requirement                        Status
+-------------------------------     ----------------------------
+High-level overview                 Meets or Exceeds Requirement
+Comparison to existing software     Meets or Exceeds Requirement
+Important features listed           Meets or Exceeds Requirement
+Hardware/software Requirements      Software OK, Hardware missing
+End users identified                Meets or Exceeds Requirement
+Maintenance discussed               Missing
+Applies prior learning              Missing
+Extends prior learning              Missing
+Appropriate difficulty              Partially fulfilled
+Feasible in one semester            Missing
+Required skills/tools available     Missing
+Interest and motivation             Partially fulfilled
+
+
+Summary:
+--------
+Overall Assessment
+The proposal provides a strong project description and successfully covers
+most of the verbal description requirements.  However, it largely omits the
+justification section required by the CMSI 4071 Proposal Guidelines.  In
+addition there are missing or partial discussions of the following topics
+which should be addressed:
+
+   Hardware requirements
+   Maintenance discussion
+   Application of prior learning
+   Extension of prior learning
+   Explicit discussion of technical difficulty
+   Semester feasibility
+   Team skills and resources
+   Explicit statement of team interest
+
+Guideline-Based Recommendation
+To align fully with the proposal guidelines, add a dedicated Justification
+section that directly addresses all six justification criteria listed in the
+guidelines, plus brief discussions of hardware requirements and maintenance.
+Most of these additions could be accomplished in one or two sentences.
+
+Earned 3.5% for this deliverable, based mostly on the excellent presentation.
+
+Not a bad job overall!  Keep up the good work.
