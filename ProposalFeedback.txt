@@ -1,6 +1,6 @@
 CMSI 4071 Fall 2026
 Project Proposal Feedback
-Project: Gather academic tool
+Project: Gather TODO list management
 =========================
 Guideline Requirement                        Status
 -------------------------------     ----------------------------
