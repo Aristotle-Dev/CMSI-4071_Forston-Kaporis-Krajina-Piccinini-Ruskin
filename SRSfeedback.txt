@@ -1,0 +1,192 @@
+
+Documentation Feedback ~ Deliverable #2
+Software Requirements Specification
+Initial Development Schedule
+CMSI 4071 Fall 2026
+=======================================
+
+COMPONENT BREAKDOWN:
+   Assessment: GOOD
+      The document identifies three primary CSCs:
+         * GUI (Frontend React) Subsystem
+         * Backend (Node JS + Express) Subsystem
+         * Database (Firebase) Subsystem
+      These components correspond to a conventional web-application
+      architecture and generally separate presentation, business logic, and
+      data persistence responsibilities.
+   Completeness Analysis
+      The decomposition adequately supports the major workflows of the
+      system, including authentication, assignment management, Brightspace
+      integration, PDF processing, AI-assisted extraction, and data storage.
+      Responsibilities are generally assigned to reasonable subsystems.
+   Areas Missing or Underdeveloped
+      * AI processing is treated as backend functionality rather than a
+         distinct subsystem.
+      * Brightspace integration is significant enough to justify dedicated
+         component treatment.
+      * No explicit data-ingestion component exists despite PDF extraction,
+         scraping, and AI processing being major system functions.
+      * Interfaces between CSCs are not formally documented.
+   Suggestions for Improvement
+      * Add dedicated CSCs or CSUs for Data Ingestion/Extraction and AI
+         Processing so that PDF parsing, URL scraping, and LLM integration
+         responsibilities are more clearly separated.
+      * Add interface specifications describing the data exchanged among
+         the GUI, Backend, Database, Brightspace integration, and AI
+         services.
+
+FUNCTIONAL REQUIREMENTS:
+   Assessment: VERY GOOD
+      The functional requirements section is comprehensive and covers the
+      major user-facing and backend workflows required for the application.
+      Coverage includes:
+         * User authentication
+         * Registration
+         * Password reset
+         * Assignment creation
+         * Assignment editing
+         * Assignment deletion
+         * Task review
+         * Brightspace integration
+         * PDF processing
+         * URL scraping
+         * AI-based extraction
+         * Database persistence
+         * Account management
+         * Security controls
+   Completeness Analysis
+      The requirements successfully describe the primary end-to-end workflow
+      of acquiring assignments from multiple sources, presenting them to the
+      user, and managing them within a unified task list. User interfaces,
+      backend processing, and data-storage responsibilities are generally
+      covered well.
+   Areas Missing or Underdeveloped
+      * Notification functionality is absent.
+      * Account settings are only minimally defined.
+      * No administrative requirements exist.
+      * Audit logging requirements are limited.
+      * Error recovery requirements are not extensively covered.
+      * Data backup and restoration behavior are not defined.
+   Additional Observations
+      * Requirement numbering contains a duplicate identifier
+         (5.3.1.17 appears twice).
+      * Several GUI requirements describe groups of functionality that could
+         be decomposed into more atomic requirements.
+      * Some requirements reference examples instead of precise behaviors.
+   Suggestions for Improvement
+   ---------------------------
+      * Add requirements governing notifications, reminders, account
+         preferences, account deletion, and user privacy controls.
+      * Add administrative, auditing, backup, and recovery requirements,
+         including protection against accidental data loss and support for
+         troubleshooting.
+
+PERFORMANCE REQUIREMENTS:
+   Assessment: GOOD
+      The performance requirements provide measurable timing targets for
+      many common user operations.  Examples include:
+         * Dashboard loading within 5 seconds.
+         * Task creation confirmation within 3-5 seconds.
+         * Task deletion confirmation within 3-5 seconds.
+         * Task editing updates within 3 seconds.
+         * Search results within 3 seconds.
+         * Assignment-review display within 10 seconds.
+         * Database save and retrieval operations within 3 seconds.
+   Completeness Analysis
+      Most user-facing actions have associated response-time expectations,
+      which improves testability. The document also includes requirements
+      for duplicate detection, external-source availability handling, and
+      error reporting.
+   Areas Missing or Underdeveloped
+      * Scalability requirements are absent.
+      * Concurrent-user requirements are absent.
+      * Availability requirements are absent.
+      * Reliability requirements are absent.
+      * Resource-utilization limits are absent.
+      * Recovery-time objectives are not quantified.
+   Additional Observations
+      * Several requirements under Data Processing and Errors are actually
+         functional requirements and may be better placed in Section 5.3.
+      * The requirement "within 3-5 seconds" is measurable but less precise
+         than a single target threshold.
+   Suggestions for Improvement
+      * Add requirements for concurrent users, uptime, reliability,
+         disaster recovery, and maximum acceptable outage duration.
+      * Add measurable resource and scalability requirements such as memory
+         usage, storage limits, API throughput, and supported user capacity.
+
+ENVIRONMENT REQUIREMENTS:
+   Assessment: GOOD
+      The document separates development and execution environments and
+      identifies the primary technologies required to develop and operate the
+      system. Technologies, frameworks, operating systems, browsers, and
+      development tools are all listed.
+   Completeness Analysis
+      The development environment identifies:
+         * JavaScript
+         * React
+         * Node.js
+         * Express
+         * Firebase
+         * Llama
+         * Git
+         * Visual Studio Code
+      The execution environment identifies supported devices, browsers,
+      internet access requirements, and user-account requirements.
+   Areas Missing or Underdeveloped
+      * Software versions are not specified.
+      * Hardware requirements are minimal.
+      * Testing environments are not defined.
+      * Deployment environment details are absent.
+      * Monitoring and logging environments are absent.
+      * Backup and disaster-recovery environments are absent.
+   Suggestions for Improvement
+      * Specify supported versions of React, Node.js, Firebase, browsers,
+         operating systems, and AI services to improve reproducibility.
+      * Add testing, deployment, monitoring, backup, and disaster-recovery
+         environment requirements, including cloud-hosting assumptions and
+         operational-support tooling.
+
+OVERALL ASSESSMENT:
+   Category                          Points
+   Component Breakdown                 1/1
+   Functional Requirements             4/4
+   Performance Requirements            2/2
+   Environment Requirements            1/1
+                                     =====
+   Subtotal                            8/8
+   Preliminary Schedule                0/2
+   ------------------------------------------------------
+   Total Percentage:    8/10 = 80% which is a B
+
+OVERALL ASSESSMENT:
+   This is a solid Waterfall-style SRS that follows the expected
+   requirements structure and makes good use of mandatory requirement
+   language. The functional requirements are the strongest section,
+   providing thorough coverage of the application's primary workflows.
+   The component breakdown is adequate but could be expanded to better
+   represent AI and data-ingestion functionality. Performance
+   requirements are measurable but limited primarily to response times,
+   while environmental requirements provide a reasonable baseline but
+   lack deployment and operational detail.
+
+   This is well done, with a couple of exceptions.  When you are making your
+   requirements, be sure that each requirement is only ONE requirement.  For
+   example, in "Account Management" you have:
+      5.3.2.11 The Backend subsystem shall provide API endpoints to create,
+               edit, and delete user accounts.
+   This should properly be three requirements so they can be tested:
+      5.3.2.11 The Backend subsystem shall provide API endpoints to create
+               user accounts.
+      5.3.2.12 The Backend subsystem shall provide API endpoints to edit
+               user accounts.
+      5.3.2.13 The Backend subsystem shall provide API endpoints to delete
+               user accounts.
+   Doing them this way will facilitate individual testing, and perhaps also
+   will help with development since you can build the three functions one
+   at a time.
+
+Nice work!  Good attention to detail throughout the SRS.
+
+I don't see a schedule anywhere, though.... :(
+
