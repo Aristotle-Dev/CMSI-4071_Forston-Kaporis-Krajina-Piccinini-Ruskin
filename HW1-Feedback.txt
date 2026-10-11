@@ -1,0 +1,64 @@
+
+Essay Feedback
+Homework Assignment #1
+CMSI 4071 Fall 2026
+======================
+
+SUMMARY:
+   Your essay successfully captures the major themes of your chosen article,
+      including:
+         * Ethical concerns surrounding AI adoption in the workplace.
+         * Bias and inaccuracies resulting from problematic training data.
+         * Transparency and explainability challenges.
+         * Privacy and security concerns.
+         * The importance of human oversight and organizational governance.
+   You demonstrate a solid understanding of the article's primary arguments
+      and ethical concerns.  However, the summary portion is relatively brief
+      and transitions fairly quickly into the software-engineering discussion.
+      Several article-specific recommendations, frameworks, and nuances are
+         not explored in much depth.
+   Areas for Improvement
+      More detailed discussion of the article's specific recommendations and
+         examples.
+      Greater emphasis on the article itself before shifting into analysis.
+
+RELATION TO S/W ENGINEERING
+   This is the strongest aspect of the paper.  You have made numerous
+      thoughtful connections between the article and software engineering
+      practice, including:
+        * Security and privacy implications of AI-assisted development.
+        * Risks of exposing proprietary code and information to AI systems.
+        * Code review and quality assurance challenges.
+   The discussion is concrete and grounded in realistic software engineering
+      scenarios rather than general statements.  The Tea App example and
+      comparisons to autonomous vehicles help illustrate the practical
+      implications of AI-related engineering decisions.
+   Minor Deduction: A few additional references to software engineering
+      fundamentals such as requirements engineering, testing strategies, or
+      verification and validation could have strengthened the discussion
+      further.
+
+THOUGHTS/OPINIONS
+   The paper contains substantial original reflection and personal analysis.
+   Unlike many submissions that remain purely descriptive, this essay clearly
+      articulates your own reasoning and conclusions throughout much of the
+      second half of the essay.
+
+SPELLING/GRAMMAR
+   The essay is generally clear and readable.  The ideas are communicated
+      effectively, but the paper would benefit from additional proofreading
+      and editing for clarity and professionalism.
+
+OVERALL ASSESSMENT:
+   Category                          Points
+   Summary of article                  28
+   Relation to S/W engineering         29
+   Thoughts/opinions presented         30
+   Spelling/Grammar                    10
+                                     -----
+   Subtotal                            97
+   ------------------------------------------------------------
+   Total Percentage:   97 out of 100 = 97% which is an A-plus
+
+
+
