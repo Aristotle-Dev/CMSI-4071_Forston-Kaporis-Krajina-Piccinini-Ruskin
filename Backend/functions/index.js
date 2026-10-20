@@ -9,7 +9,9 @@
 
 const {setGlobalOptions} = require("firebase-functions");
 const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+const express = require("express");
+const assignmentRouter = require("./src/routes/assignmentRouter");
+const userRouter = require("./src/routes/userRouter");
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
@@ -21,12 +23,14 @@ const logger = require("firebase-functions/logger");
 // functions should each use functions.runWith({ maxInstances: 10 }) instead.
 // In the v1 API, each function can only serve one request per container, so
 // this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({maxInstances: 10});
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+const app = express();
+app.use(express.json());
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Mount routers
+app.use("/assignments", assignmentRouter);
+app.use("/users", userRouter);
+
+// Expose Express API as a Cloud Function
+exports.api = onRequest(app);
