@@ -1,0 +1,115 @@
+
+Documentation Feedback ~ Deliverable #3
+Software Development Plan [SDP]
+CMSI 4071 Fall 2026
+=======================================
+
+INTRODUCTION/DELIVERABLES SECTION:
+   Assessment: Very Good
+      Strengths
+         • Includes major project milestones from proposal through
+           final delivery.
+         • Deliverables are assigned target completion dates.
+         • Software engineering documents such as requirements, SDP,
+           architecture, and detailed design are included.
+         • Demonstration, testing, documentation, and final delivery
+           activities are incorporated.
+         • Deliverable descriptions clearly explain their intended
+           purpose.
+      Areas for Improvement
+         • Acceptance criteria for deliverables are not defined.
+         • Deliverable ownership is not explicitly assigned.
+      Suggestions
+         1. Define measurable acceptance criteria for each major
+            deliverable, including required reviews, testing, and
+            approval activities.
+         2. Assign a primary owner and reviewer for each deliverable to
+            improve accountability and progress tracking.
+
+PROJECT RESOURCES SECTION:
+   Assessment: Excellent
+      Strengths
+         • Hardware and software resources are clearly separated.
+         • Software resources are comprehensive and well documented.
+         • Technologies are linked directly to planned project
+           functionality.
+         • Development, testing, deployment, AI processing, and
+           integration tools are identified.
+         • Resource descriptions explain why each tool is needed.
+         • Multiple testing and debugging resources are included.
+      Areas for Improvement
+         • Hardware resources are described only at a high level.
+         • Capacity planning and resource contingency information are
+           not discussed.
+      Suggestions
+         1. Specify minimum hardware requirements for development,
+            testing, and deployment environments.
+         2. Include contingency plans for critical third-party
+            services such as Firebase, Brightspace APIs, and LLM
+            providers.
+
+PROJECT ORGANIZATION SECTION:
+   Assessment: Good
+      Strengths
+         • Team roles are clearly identified.
+         • Leadership and primary technical responsibilities are
+           assigned.
+         • Frontend and backend ownership are separated logically.
+         • Team structure is easy to understand.
+      Areas for Improvement
+         • Responsibilities are described very briefly.
+         • No organizational chart is provided.
+         • Review responsibilities are not identified.
+         • Communication and decision-making processes are not
+           discussed.
+      Suggestions
+         1. Expand role descriptions to include specific development,
+            testing, documentation, and review responsibilities.
+         2. Add a simple organizational chart and define meeting,
+            communication, and decision-making procedures.
+
+PROJECT SCHEDULE SECTION:
+   Assessment: Very Good
+      Strengths
+         • Includes a PERT chart and Task/Resource Table.
+         • Development activities are decomposed into detailed tasks.
+         • Tasks cover design, implementation, integration, testing,
+           optimization, and documentation.
+         • Schedule reflects realistic subsystem development.
+         • Resource assignments are connected to implementation tasks.
+         • Testing and performance validation tasks are included.
+      Areas for Improvement
+         • Task durations are not clearly identified.
+         • Milestone completion criteria are not specified.
+         • Critical-path activities are not explicitly identified.
+         • Schedule dependencies could be clearer.
+      Suggestions
+         1. Add estimated durations and completion criteria for major
+            tasks and milestones.
+         2. Identify critical-path activities and explicitly document
+            task dependencies to improve schedule management.
+
+
+OVERALL ASSESSMENT:
+   Category                          Points
+   Project Deliverables                0.8
+   Project Resources                   1
+   Project Organization                0.7
+   Project Schedule                    1.8
+                                     =====
+   Subtotal                            4.3
+   ------------------------------------------------------
+   Total Percentage:   4.3/5 = 86% which is a B-plus
+
+   This SDP provides a solid foundation for project execution and addresses
+      the major planning areas expected in the course SDP outline. The
+      Deliverables and Resources sections are particularly strong and
+      demonstrate good understanding of the project's technical needs. The
+      Organization section is the least developed because role descriptions
+      are brief and do not describe management processes in detail.
+   The most significant improvements would be adding acceptance criteria for
+      deliverables, documenting organizational and communication procedures,
+      and expanding schedule details to include durations, dependencies, and
+      critical-path analysis.
+
+Very nice work on this document!
