@@ -12,6 +12,7 @@ const {onRequest} = require("firebase-functions/https");
 const express = require("express");
 const assignmentRouter = require("./src/routes/assignmentRouter");
 const userRouter = require("./src/routes/userRouter");
+const brightspaceRouter = require("./src/routes/brightspaceRouter");
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
@@ -31,6 +32,7 @@ app.use(express.json());
 // Mount routers
 app.use("/assignments", assignmentRouter);
 app.use("/users", userRouter);
+app.use("/brightspace", brightspaceRouter);
 
 // Expose Express API as a Cloud Function
 exports.api = onRequest(app);

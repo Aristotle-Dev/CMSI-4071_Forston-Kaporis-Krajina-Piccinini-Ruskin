@@ -46,6 +46,14 @@
   //     ]
   //   },
   // ]
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "brightspaceAuth",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "state", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }
