@@ -17,7 +17,11 @@
  *   BRIGHTSPACE_BASE_URL        — e.g. "https://lmu.brightspace.com"
  *   BRIGHTSPACE_REDIRECT_URI    — e.g. "https://<project>.cloudfunctions.net/api/brightspace/callback"
  *   BRIGHTSPACE_SCOPES          — space-separated scopes (e.g. "core:*:read")
+ *
+ * Every HTTP call goes through brightspaceFetch, which writes the audit log.
  */
+
+const {brightspaceFetch} = require("./auditLog");
 
 /**
  * Returns Brightspace OAuth configuration from environment variables.
@@ -93,10 +97,11 @@ function buildAuthorizeUrl(state, codeChallenge) {
  *
  * @param {string} code Authorization code from the callback query string.
  * @param {string} codeVerifier The original PKCE verifier for this flow.
+ * @param {string} [uid] Firebase user ID (for audit logging).
  * @return {Promise<{accessToken: string, refreshToken: string, expiresIn: number}>}
  * @throws {Error} If the token exchange fails.
  */
-async function exchangeCodeForTokens(code, codeVerifier) {
+async function exchangeCodeForTokens(code, codeVerifier, uid) {
   const config = getConfig();
 
   const body = new URLSearchParams({
@@ -106,7 +111,7 @@ async function exchangeCodeForTokens(code, codeVerifier) {
     code_verifier: codeVerifier,
   });
 
-  const response = await fetch(config.tokenUrl, {
+  const response = await brightspaceFetch(config.tokenUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -116,7 +121,7 @@ async function exchangeCodeForTokens(code, codeVerifier) {
       ).toString("base64"),
     },
     body: body.toString(),
-  });
+  }, {uid, action: "token_exchange"});
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -139,10 +144,11 @@ async function exchangeCodeForTokens(code, codeVerifier) {
  * both tokens are returned so the caller can store the new refresh token.
  *
  * @param {string} refreshToken Current refresh token (decrypted).
+ * @param {string} [uid] Firebase user ID (for audit logging).
  * @return {Promise<{accessToken: string, refreshToken: string | null, expiresIn: number}>}
  * @throws {Error} If the refresh fails (token may have been revoked).
  */
-async function refreshAccessToken(refreshToken) {
+async function refreshAccessToken(refreshToken, uid) {
   const config = getConfig();
 
   const body = new URLSearchParams({
@@ -150,7 +156,7 @@ async function refreshAccessToken(refreshToken) {
     refresh_token: refreshToken,
   });
 
-  const response = await fetch(config.tokenUrl, {
+  const response = await brightspaceFetch(config.tokenUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -159,7 +165,7 @@ async function refreshAccessToken(refreshToken) {
       ).toString("base64"),
     },
     body: body.toString(),
-  });
+  }, {uid, action: "token_refresh"});
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -184,9 +190,10 @@ async function refreshAccessToken(refreshToken) {
  * Per ITS requirement #2, revocation should "take effect immediately."
  *
  * @param {string} token The refresh token to revoke.
+ * @param {string} [uid] Firebase user ID (for audit logging).
  * @return {Promise<void>}
  */
-async function revokeToken(token) {
+async function revokeToken(token, uid) {
   const config = getConfig();
 
   const body = new URLSearchParams({
@@ -194,7 +201,7 @@ async function revokeToken(token) {
     token_type_hint: "refresh_token",
   });
 
-  const response = await fetch(config.revokeUrl, {
+  const response = await brightspaceFetch(config.revokeUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -203,7 +210,7 @@ async function revokeToken(token) {
       ).toString("base64"),
     },
     body: body.toString(),
-  });
+  }, {uid, action: "token_revoke"});
 
   // RFC 7009: revocation endpoint returns 200 even if the token was
   // already invalid.  We only throw on unexpected errors.

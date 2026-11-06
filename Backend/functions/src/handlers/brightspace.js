@@ -46,7 +46,15 @@ const {
   revokeToken,
 } = require("../helpers/brightspaceClient");
 
-const {logApiAccess} = require("../helpers/auditLog");
+const {logBrightspaceEvent} = require("../helpers/auditLog");
+
+const {
+  BrightspaceApiError,
+  getAccessToken,
+  fetchMyCourses,
+  fetchCourseAssignments,
+  fetchAssignmentsForCourses,
+} = require("../helpers/brightspaceApi");
 
 const {getAssignmentsCollection} = require("../helpers/assignments");
 
@@ -98,18 +106,15 @@ async function connectHandler(req, res) {
     // 4. Build the URL and return it to the frontend
     const authorizeUrl = buildAuthorizeUrl(state, codeChallenge);
 
-    await logApiAccess({
-      uid,
-      endpoint: "/d2l/api/oauth2/authorize",
-      method: "GET",
-      statusCode: 200,
-      latencyMs: null,
-      error: null,
-    });
+    await logBrightspaceEvent({uid, action: "connect_started"});
 
     return res.status(200).json({authorizeUrl});
   } catch (error) {
     console.error("❌ Error starting Brightspace OAuth:", error);
+    await logBrightspaceEvent({
+      action: "connect_started", outcome: "failure",
+      details: {message: String(error.message).slice(0, 200)},
+    });
     return res.status(500).json({error: "Failed to start Brightspace connection"});
   }
 }
@@ -144,17 +149,25 @@ async function connectHandler(req, res) {
  * @return {Promise<import("express").Response>}
  */
 async function callbackHandler(req, res) {
+  let uid = null; // known once the state is matched; used in failure logs
   try {
     const {code, state, error: oauthError} = req.query;
 
     // Handle user denial or Brightspace errors
     if (oauthError) {
       console.error("Brightspace OAuth error:", oauthError);
+      await logBrightspaceEvent({
+        action: "connect_failed", outcome: "failure",
+        details: {reason: String(oauthError).slice(0, 100)},
+      });
       // TODO: Replace with your app's frontend URL
       return res.redirect(`${getAppUrl()}/brightspace/error?reason=${oauthError}`);
     }
 
     if (!code || !state) {
+      await logBrightspaceEvent({
+        action: "connect_failed", outcome: "failure", details: {reason: "missing_code_or_state"},
+      });
       return res.status(400).json({error: "Missing code or state parameter"});
     }
 
@@ -164,28 +177,23 @@ async function callbackHandler(req, res) {
     const pendingResult = await findPendingAuthByState(state);
 
     if (!pendingResult) {
+      await logBrightspaceEvent({
+        action: "connect_failed", outcome: "failure", details: {reason: "invalid_state"},
+      });
       return res.status(400).json({
         error: "Invalid or expired state parameter. Please try connecting again.",
       });
     }
 
-    const {uid, codeVerifier} = pendingResult;
+    uid = pendingResult.uid;
+    const {codeVerifier} = pendingResult;
 
-    // Exchange the code for tokens
-    const startTime = Date.now();
-    const tokens = await exchangeCodeForTokens(code, codeVerifier);
-    const latencyMs = Date.now() - startTime;
-
-    await logApiAccess({
-      uid,
-      endpoint: "/d2l/api/oauth2/token",
-      method: "POST",
-      statusCode: 200,
-      latencyMs,
-    });
+    // Exchange the code for tokens (the HTTP call is audit-logged inside)
+    const tokens = await exchangeCodeForTokens(code, codeVerifier, uid);
 
     // Encrypt and store the refresh token
     await saveTokens(uid, tokens.refreshToken);
+    await logBrightspaceEvent({uid, action: "connect_completed"});
 
     // Redirect back to the app with a success indicator
     // TODO: Replace with your app's frontend URL
@@ -193,12 +201,10 @@ async function callbackHandler(req, res) {
   } catch (error) {
     console.error("❌ Error in Brightspace callback:", error);
 
-    await logApiAccess({
-      uid: "unknown",
-      endpoint: "/d2l/api/oauth2/token",
-      method: "POST",
-      statusCode: 500,
-      error: error.message,
+    await logBrightspaceEvent({
+      uid: uid || "unknown",
+      action: "connect_failed", outcome: "failure",
+      details: {reason: "token_exchange_failed", message: String(error.message).slice(0, 200)},
     });
 
     // TODO: Replace with your app's frontend URL
@@ -237,7 +243,7 @@ async function disconnectHandler(req, res) {
     const refreshToken = await getRefreshToken(uid);
     if (refreshToken) {
       try {
-        await revokeToken(refreshToken);
+        await revokeToken(refreshToken, uid);
       } catch (revokeError) {
         // Log but don't fail — we still want to clean up locally
         console.error("⚠️ Token revocation failed:", revokeError);
@@ -248,13 +254,11 @@ async function disconnectHandler(req, res) {
     await clearBrightspaceData(uid);
 
     // 3. Delete all Brightspace-sourced assignments for this user
-    await deleteBrightspaceAssignments(uid);
+    const deletedAssignments = await deleteBrightspaceAssignments(uid);
 
-    await logApiAccess({
-      uid,
-      endpoint: "disconnect",
-      method: "POST",
-      statusCode: 200,
+    await logBrightspaceEvent({
+      uid, action: "disconnected",
+      details: {tokenRevoked: !!refreshToken, deletedAssignments},
     });
 
     return res.status(200).json({
@@ -262,6 +266,10 @@ async function disconnectHandler(req, res) {
     });
   } catch (error) {
     console.error("❌ Error disconnecting Brightspace:", error);
+    await logBrightspaceEvent({
+      action: "disconnected", outcome: "failure",
+      details: {message: String(error.message).slice(0, 200)},
+    });
     return res.status(500).json({error: "Failed to disconnect Brightspace"});
   }
 }
@@ -296,8 +304,115 @@ async function statusHandler(req, res) {
 }
 
 // ---------------------------------------------------------------------------
+// GET /brightspace/courses
+// GET /brightspace/courses/:orgUnitId/assignments
+// GET /brightspace/assignments
+// ---------------------------------------------------------------------------
+
+/**
+ * Lists the user's Brightspace courses.
+ * Query: ?activeOnly=true to drop inactive/closed courses.
+ */
+async function coursesHandler(req, res) {
+  try {
+    const uid = req.user.uid;
+    const token = await getAccessToken(uid);
+    const courses = await fetchMyCourses(uid, token, {
+      activeOnly: req.query.activeOnly === "true",
+    });
+    return res.status(200).json({courses});
+  } catch (error) {
+    return sendBrightspaceError(res, error, "Failed to fetch Brightspace courses");
+  }
+}
+
+/**
+ * Lists due-dated items for one course.
+ * Query: ?start=ISO&end=ISO&types=assignment,quiz
+ */
+async function courseAssignmentsHandler(req, res) {
+  try {
+    const opts = parseAssignmentQuery(req.query);
+    if (opts.error) return res.status(400).json({error: opts.error});
+    if (!/^\d+$/.test(req.params.orgUnitId)) {
+      return res.status(400).json({error: "orgUnitId must be numeric"});
+    }
+
+    const uid = req.user.uid;
+    const token = await getAccessToken(uid);
+    const assignments = await fetchCourseAssignments(uid, token, req.params.orgUnitId, opts);
+    return res.status(200).json({assignments});
+  } catch (error) {
+    return sendBrightspaceError(res, error, "Failed to fetch Brightspace assignments");
+  }
+}
+
+/**
+ * Fetches the user's courses, then the due-dated items in each.
+ * Query: ?start=ISO&end=ISO&types=assignment,quiz&activeOnly=true
+ */
+async function allAssignmentsHandler(req, res) {
+  try {
+    const opts = parseAssignmentQuery(req.query);
+    if (opts.error) return res.status(400).json({error: opts.error});
+
+    const uid = req.user.uid;
+    const token = await getAccessToken(uid); // one refresh for the whole sync
+    const courses = await fetchMyCourses(uid, token, {
+      activeOnly: req.query.activeOnly === "true",
+    });
+    const {assignments, errors} = await fetchAssignmentsForCourses(uid, token, courses, opts);
+    return res.status(200).json({courses, assignments, errors});
+  } catch (error) {
+    return sendBrightspaceError(res, error, "Failed to fetch Brightspace assignments");
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Parses ?start, ?end and ?types into options for fetchCourseAssignments.
+ *
+ * @param {Object} query Express req.query.
+ * @return {Object} Options, or {error} if invalid.
+ */
+function parseAssignmentQuery(query) {
+  const opts = {};
+  for (const [param, key] of [["start", "startDateTime"], ["end", "endDateTime"]]) {
+    if (query[param]) {
+      const d = new Date(query[param]);
+      if (isNaN(d.getTime())) return {error: `Invalid ${param} date`};
+      opts[key] = d.toISOString();
+    }
+  }
+  if (opts.startDateTime && opts.endDateTime && opts.startDateTime > opts.endDateTime) {
+    return {error: "start must be before end"};
+  }
+  if (query.types) {
+    opts.types = String(query.types).split(",").map((t) => t.trim()).filter(Boolean);
+  }
+  return opts;
+}
+
+/**
+ * Maps Brightspace errors to HTTP responses. 401/403 from Brightspace
+ * become 401 so the frontend knows to show "Reconnect Brightspace".
+ */
+function sendBrightspaceError(res, error, fallbackMessage) {
+  console.error(`❌ ${fallbackMessage}:`, error);
+  if (error instanceof BrightspaceApiError) {
+    if (error.status === 401 || error.status === 403) {
+      return res.status(401).json({error: error.message, reconnect: true});
+    }
+    if (error.status === 429) {
+      return res.status(503).json({error: "Brightspace is rate limiting requests; try again shortly"});
+    }
+  }
+  return res.status(502).json({error: fallbackMessage});
+}
+
 
 /**
  * Finds a pending auth record by its state parameter.
@@ -384,4 +499,7 @@ module.exports = {
   callbackHandler,
   disconnectHandler,
   statusHandler,
+  coursesHandler,
+  courseAssignmentsHandler,
+  allAssignmentsHandler,
 };
