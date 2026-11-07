@@ -1,0 +1,338 @@
+
+Documentation Feedback ~ Deliverable #4
+Software Design Document ~ Architecture
+CMSI 4071 Fall 2026
+=======================================
+
+INTRODUCTION SECTION:
+   System objectives section
+      Strengths
+         Strong alignment with user goals.
+         Clearly defines the problem being solved.
+         Includes important security objectives.
+         Includes performance objectives.
+         Maintains traceability to the requirements.
+      Suggestions
+         Add explicit maintainability objectives.
+         Add reliability objectives.
+         Add availability objectives.
+         Include a brief discussion of scalability goals.
+
+   Hardware, software, and human interfaces section
+      Strengths
+         Comprehensive and well organized.
+         Covers user interaction, network interfaces, authentication,
+            external services, AI services, and persistence technologies.
+         Distinguishes implemented and planned functionality.
+         Provides useful architectural context.
+      Suggestions
+         Reduce emphasis on exact package versions.
+         Focus more on architectural responsibilities than dependency
+            inventories.
+         Include an architectural overview diagram reference near the start
+            of the section.
+         GRAPHICAL USER INTERFACE
+            Strengths
+               Clearly describes the user-facing architecture.
+               Identifies major pages and workflows.
+               Appropriately separates implemented and planned features.
+               Maintains consistency with requirements.
+            Suggestions
+               Explicitly identify ownership boundaries between frontend
+                  and backend.
+               Clarify where validation responsibilities reside.
+         DISPLAY HARDWARE
+            Strengths
+               Appropriate hardware assumptions.
+               Consistent with execution-environment requirements.
+            Suggestions
+               Connect display assumptions to usability objectives.
+               Discuss accessibility assumptions.
+         KEYBOARD, POINTING AND TOUCH INPUT
+            Strengths
+               Covers multiple interaction methods.
+               Includes keyboard accessibility considerations.
+            Suggestions
+               Briefly explain why these interfaces are architecturally
+                  relevant.
+         NETWORK HARDWARE
+            Strengths
+               Clearly identifies connectivity requirements.
+               Properly distinguishes user and cloud infrastructure.
+            Suggestions
+               Discuss behavior during connectivity failures.
+               Clarify architectural handling of interrupted requests.
+         NETWORK AND COMMUNICATION PROTOCOLS
+            Strengths
+               One of the strongest interface sections.
+               Clearly defines communication protocols.
+               Identifies authentication boundaries.
+               Documents transport mechanisms thoroughly.
+            Suggestions
+               Discuss API versioning strategy.
+               Discuss future backward-compatibility considerations.
+         REACT
+            Strengths
+               Clearly identifies frontend responsibility.
+               Appropriate architectural abstraction.
+            Suggestions
+               Reduce emphasis on version numbers.
+               Focus on frontend architectural responsibilities.
+         VITE
+            Strengths
+               Correctly distinguishes development tooling.
+            Suggestions
+               This section contributes little to runtime architecture.
+               Consider shortening or merging into development-tool
+                  discussion.
+         NODE.JS AND EXPRESS
+            Strengths
+               Clearly identifies backend responsibilities.
+               Establishes routing ownership.
+               Consistent with requirements.
+            Suggestions
+               Describe error-handling responsibilities more explicitly.
+               Discuss scalability assumptions.
+         FIREBASE CLOUD FUNCTIONS
+            Strengths
+               Strong description of deployment architecture.
+               Clearly assigns hosting responsibilities.
+            Suggestions
+               Discuss implications for availability and scaling.
+         FIREBASE ADMIN SDK, AUTHENTICATION, CLOUDFIRESTORE AND CLOUD STORAGE
+            Strengths
+               Strong architectural explanation.
+               Good separation of authentication and persistence.
+               Aligns well with requirements.
+            Suggestions
+               Clarify backup and recovery assumptions.
+               Clarify long-term data-retention responsibilities.
+         FIREBASE AUTHENTICATION CLIENT SDK
+            Strengths
+               Maintains clear authentication boundaries.
+               Supports planned security model.
+            Suggestions
+               Finalize unresolved authentication-provider decisions.
+               Clarify account-recovery architecture.
+         CORS
+            Strengths
+               Demonstrates awareness of security boundaries.
+            Suggestions
+               Architectural importance could be explained more clearly.
+         BRIGHTSPACE API
+            Strengths
+               Excellent architectural treatment.
+               Strong security discussion.
+               Clearly assigns integration ownership.
+               Explicitly addresses audit-log requirements.
+            Suggestions
+               Discuss behavior during prolonged Brightspace outages.
+               Describe synchronization scheduling assumptions.
+         OPENROUTER / LLAMA 3
+            Strengths
+               Strong explanation of AI responsibilities.
+               Good handling of schema validation.
+               Appropriate security separation.
+            Suggestions
+               Clarify model-selection strategy.
+               Discuss fallback behavior if AI services become unavailable.
+         PDF PARSING AND WEB PAGE FETCHING LIBRARIES
+            Strengths
+               Strong alignment with ingestion requirements.
+               Appropriate treatment of temporary storage.
+            Suggestions
+               Discuss malformed-document handling.
+               Clarify extraction-failure recovery.
+         CRYPTOGRAPHY SERVICES
+            Strengths
+               Strong security rationale.
+               Appropriate treatment of token protection.
+            Suggestions
+               Discuss key-rotation considerations.
+               Clarify long-term key-management plans.
+
+ARCHITECTURAL DESIGN SECTION:
+   Major software components section
+      MAJOR SOFTWARE COMPONENTS
+         CSC-1 WEB CLIENT
+            Strengths
+               Clear presentation responsibility.
+               Good separation from business logic.
+               Appropriate frontend ownership.
+            Suggestions
+               Discuss client-side caching responsibilities.
+               Clarify ownership of validation logic.
+         CSC-2 API / IDENTITY
+            Strengths
+               Strong security boundary.
+               Good separation from persistence concerns.
+               Clearly acts as the system gateway.
+            Suggestions
+               Clarify rate-limiting responsibilities.
+               Clarify ownership of audit logging.
+         CSC-3 BRIGHTSPACE INTEGRATION
+            Strengths
+               One of the strongest component descriptions.
+               Clear integration ownership.
+               Excellent auditability discussion.
+            Suggestions
+               Discuss retry strategies.
+               Discuss synchronization scheduling.
+         CSC-4 DATA INGESTION
+            Strengths
+               Clearly defined responsibility.
+               Good separation from AI processing.
+            Suggestions
+               Clarify duplicate-source handling.
+               Discuss ingestion error classification.
+         CSC-5 AI EXTRACTION AND REVIEW
+            Strengths
+               Strong alignment with requirements.
+               Excellent treatment of review-before-approval workflow.
+               Good duplicate-detection ownership.
+            Suggestions
+               Describe duplicate-detection strategy at a higher level.
+               Clarify validation-failure handling.
+         CSC-6 DATA MANAGEMENT
+            Strengths
+               Strong security-oriented design.
+               Clear ownership of persistence.
+               Appropriate user scoping.
+            Suggestions
+               Discuss indexing strategy.
+               Discuss backup and recovery assumptions.
+      MAJOR SOFTWARE INTERACTIONS
+         SIGN IN
+            Strengths
+               Clear authentication flow.
+               Appropriate separation of responsibilities.
+            Suggestions
+               Discuss session-expiration handling.
+         BROWSER TO API
+            Strengths
+               Clearly defined security boundary.
+               Good authentication treatment.
+            Suggestions
+               Clarify error-response standards.
+               Discuss request throttling.
+         API TO FIRESTORE
+            Strengths
+               Strong repository abstraction.
+               Good user-isolation model.
+            Suggestions
+               Discuss transaction behavior.
+               Explain consistency assumptions.
+         BRIGHTSPACE CONNECTION
+            Strengths
+               Excellent OAuth workflow description.
+               Strong security handling.
+            Suggestions
+               Discuss synchronization after token refresh.
+         BRIGHTSPACE USAGE LOGGING
+            Strengths
+               Outstanding treatment of auditability.
+               Strong failure-handling discussion.
+               Clearly satisfies external requirements.
+            Suggestions
+               Clarify retention policies.
+         IMPORT TO CLOUD STORAGE AND AI
+            Strengths
+               Clear pipeline architecture.
+               Good separation of ingestion and AI concerns.
+            Suggestions
+               Discuss large-import behavior.
+               Discuss retry policies.
+         REVIEW TO DATABASE
+            Strengths
+               Strong alignment with approval requirements.
+               Good duplicate prevention focus.
+            Suggestions
+               Clarify conflict-resolution behavior.
+         ERROR HANDLING
+            Strengths
+               Appropriate failure containment.
+               Prevents accidental data modification.
+            Suggestions
+               Expand recovery behavior discussion.
+               Add operational monitoring considerations.
+
+   Architectural design diagrams section
+      Strengths
+         Includes all major architectural viewpoints expected for an
+            architectural SDD.
+         Diagrams align closely with textual descriptions.
+         Diagram set covers use-case, structural, and deployment
+            perspectives.
+      Suggestions
+         Add references to diagrams earlier in the document.
+         Include brief interpretive explanations before each figure.
+      USE CASE DIAGRAM
+         Strengths
+            Captures the major user workflows.
+            Includes external systems.
+            Represents review and import processes clearly.
+         Suggestions
+            Show settings/account-management functionality explicitly.
+            Include Brightspace notification synchronization if it is
+               considered a user-visible capability.
+      TOP-LEVEL CLASS DIAGRAM
+         Strengths
+            Excellent architectural abstraction.
+            Clearly depicts major interfaces and responsibilities.
+            Appropriate level of detail for architecture.
+         Suggestions
+            Highlight CSC ownership boundaries more prominently.
+            Improve readability of dependency paths.
+      COMPONENT / DEPLOYMENT DIAGRAM
+         Strengths
+            One of the strongest diagrams.
+            Clearly illustrates deployment locations.
+            Shows external dependencies effectively.
+            Maintains consistency with component descriptions.
+         Suggestions
+            Explicitly identify trust boundaries.
+            Include planned Cloud Storage persistence flows more visibly.
+
+OVERALL ASSESSMENT:
+   Category                            Points
+   -----------------------------       ------
+   INTRODUCTION:
+      System objectives                1 of 1
+      H/W, S/W, Human I/F              2 of 2
+
+   ARCHITECTURAL DESIGN SECTION:
+      Major software components        2 of 2
+      Major software interactions      2 of 2
+      Architectural design diagrams    3 of 3
+                                       ======
+                                           10
+   ------------------------------------------------------
+   Total Percentage:  10/10 = 100% which is an A-plus
+
+COMMENTS:
+The architectural SDD is strong and generally follows the expected structure
+for an architectural-level design document.  The design presents a coherent
+web-based architecture, clearly identifies major responsibilities, provides
+architectural reasoning, and establishes boundaries between user interface,
+integration, ingestion, AI processing, and persistence concerns.
+
+The document's strongest qualities are its explicit CSC decomposition, clear
+interaction descriptions, strong treatment of external integrations, and good
+traceability back to the requirements.  The most significant opportunities
+for improvement are stronger coverage of performance requirements, more
+complete discussion of operational concerns, and reducing the amount of
+implementation-specific version information.
+
+The document demonstrates sound architectural thinking, strong decomposition
+of responsibilities, clear interfaces, useful design rationale, and
+excellent consistency with the requirements.  The CSC structure significantly
+improves the clarity of the original requirements architecture while
+preserving traceability.
+
+The strongest sections are the major software components, Brightspace
+integration architecture, software interactions, security boundaries, and
+architectural diagrams.
+
+Overall Rating: Strong Architectural SDD
+
+Very well done, group!  Keep it up!
