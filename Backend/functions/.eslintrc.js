@@ -18,6 +18,8 @@ module.exports = {
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
     "max-len": "off",
+    // Windows checkouts (core.autocrlf=true) use CRLF; git stores LF.
+    "linebreak-style": "off",
   },
   overrides: [
     {

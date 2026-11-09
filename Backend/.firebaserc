@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "gather-42ec0"
+    "default": "gather-0",
+    "old": "gather-42ec0"
   }
 }

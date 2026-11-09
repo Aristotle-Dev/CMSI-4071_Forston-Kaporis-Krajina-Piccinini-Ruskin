@@ -8,40 +8,44 @@
  *   3. Refreshing an expired access token.
  *   4. Revoking tokens on disconnect.
  *
- * All Brightspace-specific URLs and credentials are loaded from
- * environment variables so nothing sensitive lives in source code.
- *
- * Environment variables required (set via Firebase Functions config):
+ * Credentials come from Google Cloud Secret Manager (see ../params.js):
  *   BRIGHTSPACE_CLIENT_ID       — OAuth app client ID (from ITS)
- *   BRIGHTSPACE_CLIENT_SECRET   — OAuth app client secret (from ITS)
+ *   BRIGHTSPACE_SECRET          — OAuth app client secret (from ITS)
+ *
+ * Non-secret settings come from environment variables, loaded by Firebase
+ * from functions/.env.<projectId> (e.g. .env.gather-0):
  *   BRIGHTSPACE_BASE_URL        — e.g. "https://lmu.brightspace.com"
- *   BRIGHTSPACE_REDIRECT_URI    — e.g. "https://<project>.cloudfunctions.net/api/brightspace/callback"
- *   BRIGHTSPACE_SCOPES          — space-separated scopes (e.g. "core:*:read")
+ *   BRIGHTSPACE_REDIRECT_URI    — must EXACTLY match the redirect URI
+ *                                 registered on the Brightspace OAuth app
+ *   BRIGHTSPACE_SCOPES          — space-separated scopes
  *
  * Every HTTP call goes through brightspaceFetch, which writes the audit log.
  */
 
 const {brightspaceFetch} = require("./auditLog");
+const {brightspaceClientId, brightspaceClientSecret} = require("../params");
 
 /**
- * Returns Brightspace OAuth configuration from environment variables.
+ * Returns Brightspace OAuth configuration from secrets + environment.
  * Centralised here so every function reads from one place.
  *
+ * Must be called at request time (secrets aren't available at load time).
+ *
  * @return {Object} Configuration object.
- * @throws {Error} If any required variable is missing.
+ * @throws {Error} If any required value is missing.
  */
 function getConfig() {
   const required = {
-    clientId: process.env.BRIGHTSPACE_CLIENT_ID,
-    clientSecret: process.env.BRIGHTSPACE_CLIENT_SECRET,
-    baseUrl: process.env.BRIGHTSPACE_BASE_URL,
+    clientId: brightspaceClientId.value(),
+    clientSecret: brightspaceClientSecret.value(),
+    baseUrl: (process.env.BRIGHTSPACE_BASE_URL || "").replace(/\/+$/, ""),
     redirectUri: process.env.BRIGHTSPACE_REDIRECT_URI,
     scopes: process.env.BRIGHTSPACE_SCOPES || "",
   };
 
   for (const [key, value] of Object.entries(required)) {
-    if (!value && key !== "scopes") {
-      throw new Error(`Missing required environment variable for Brightspace OAuth: ${key}`);
+    if (!value) {
+      throw new Error(`Missing required configuration for Brightspace OAuth: ${key}`);
     }
   }
 

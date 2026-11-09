@@ -33,7 +33,6 @@ const {
 
 const {
   savePendingAuth,
-  consumePendingAuth,
   saveTokens,
   getRefreshToken,
   isConnected,

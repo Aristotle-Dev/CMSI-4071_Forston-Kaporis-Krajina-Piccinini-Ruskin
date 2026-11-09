@@ -1,4 +1,3 @@
-const {db, FieldValue} = require("../config.js");
 const {
   createAssignment,
   getAssignments,

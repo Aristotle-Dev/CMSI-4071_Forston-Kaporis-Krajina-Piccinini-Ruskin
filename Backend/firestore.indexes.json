@@ -48,13 +48,6 @@
   // ]
   "indexes": [
     {
-      "collectionGroup": "brightspaceAuth",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        { "fieldPath": "state", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "auditLogs",
       "queryScope": "COLLECTION",
       "fields": [
@@ -71,5 +64,14 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "brightspaceAuth",
+      "fieldPath": "state",
+      "indexes": [
+        { "order": "ASCENDING", "queryScope": "COLLECTION" },
+        { "order": "ASCENDING", "queryScope": "COLLECTION_GROUP" }
+      ]
+    }
+  ]
 }

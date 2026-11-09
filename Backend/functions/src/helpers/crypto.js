@@ -10,6 +10,7 @@
  */
 
 const crypto = require("crypto");
+const {tokenEncryptionKey} = require("../params");
 
 // ---------------------------------------------------------------------------
 // PKCE helpers
@@ -57,11 +58,10 @@ function generateCodeChallenge(verifier) {
 //   be useless without the encryption key.
 //
 // Key management:
-//   The 256-bit key is loaded from an environment variable / Firebase
-//   Functions config (TOKEN_ENCRYPTION_KEY).  In production this should
-//   be set via `firebase functions:secrets:set TOKEN_ENCRYPTION_KEY` or
-//   Google Secret Manager.  For local development, set it in .env or
-//   .runtimeconfig.json.
+//   The 256-bit key is the TOKEN_ENCRYPTION_KEY secret in Google Cloud
+//   Secret Manager (see ../params.js), set via
+//   `firebase functions:secrets:set TOKEN_ENCRYPTION_KEY`.  For local
+//   development, put it in functions/.secret.local.
 //
 //   To generate a suitable key:
 //     node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -75,8 +75,8 @@ function generateCodeChallenge(verifier) {
  * @throws {Error} If the key is missing or invalid.
  */
 function getEncryptionKey() {
-  const hex = process.env.TOKEN_ENCRYPTION_KEY;
-  if (!hex || hex.length !== 64) {
+  const hex = tokenEncryptionKey.value();
+  if (!hex || !/^[0-9a-fA-F]{64}$/.test(hex)) {
     throw new Error(
         "TOKEN_ENCRYPTION_KEY must be a 64-character hex string (256 bits). " +
         "Generate one with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",

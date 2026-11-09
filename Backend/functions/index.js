@@ -13,6 +13,7 @@ const express = require("express");
 const assignmentRouter = require("./src/routes/assignmentRouter");
 const userRouter = require("./src/routes/userRouter");
 const brightspaceRouter = require("./src/routes/brightspaceRouter");
+const {apiSecrets} = require("./src/params");
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
@@ -34,5 +35,8 @@ app.use("/assignments", assignmentRouter);
 app.use("/users", userRouter);
 app.use("/brightspace", brightspaceRouter);
 
-// Expose Express API as a Cloud Function
-exports.api = onRequest(app);
+// Expose Express API as a Cloud Function. Region is pinned so the public
+// URL (and therefore the Brightspace OAuth redirect URI) stays stable:
+//   https://us-central1-gather-0.cloudfunctions.net/api/brightspace/callback
+// The secrets list mounts Secret Manager values for this function.
+exports.api = onRequest({region: "us-central1", secrets: apiSecrets}, app);
